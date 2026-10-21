@@ -123,7 +123,10 @@ async function loginWithWallet(wallet, siweMessage) {
     body: payload,
   });
 
-  if (!res.ok) throw new Error(`LoginWithWallet failed: ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`LoginWithWallet failed: ${res.status} | ${body}`);
+  }
 
   const buf = Buffer.from(await res.arrayBuffer());
   const token = extractProtoStrings(buf);
@@ -247,7 +250,7 @@ async function processWallet(wallet, twitterUsername, iface) {
   log(wallet, 'Step 1: CreateWalletChallenge...');
   const siweMsg = await createWalletChallenge(wallet);
   if (!siweMsg) throw new Error('Gagal dapet SIWE message');
-  log(wallet, `SIWE message diterima`);
+  log(wallet, `SIWE message: ${siweMsg.slice(0, 80)}...`);
 
   // Step 2: LoginWithWallet
   log(wallet, 'Step 2: LoginWithWallet...');
