@@ -95,7 +95,10 @@ async function createWalletChallenge(wallet) {
     body: payload,
   });
 
-  if (!res.ok) throw new Error(`CreateWalletChallenge failed: ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`CreateWalletChallenge failed: ${res.status} | ${body}`);
+  }
 
   // Response is proto binary, extract SIWE message
   const buf = Buffer.from(await res.arrayBuffer());
