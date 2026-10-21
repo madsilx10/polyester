@@ -4,6 +4,7 @@ const fs = require('fs');
 
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
 const WALLET_FILE = 'wallet.txt';
+const USN_FILE = 'usn.txt';
 const BASE_URL = 'https://api.testnet.polyester.com';
 const ORIGIN = 'https://testnet.polyester.com';
 
@@ -310,9 +311,25 @@ async function main() {
     process.exit(1);
   }
 
+  if (!fs.existsSync(USN_FILE)) {
+    console.error(`File ${USN_FILE} tidak ditemukan!`);
+    process.exit(1);
+  }
+
+  const usernames = fs.readFileSync(USN_FILE, 'utf8')
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 0);
+
   const wallets = privkeys.map(pk => new ethers.Wallet(pk.startsWith('0x') ? pk : `0x${pk}`));
+
+  if (wallets.length !== usernames.length) {
+    console.error(`Jumlah wallet (${wallets.length}) dan username (${usernames.length}) tidak sama!`);
+    process.exit(1);
+  }
+
   console.log(`\n📂 ${wallets.length} wallet ditemukan`);
-  wallets.forEach((w, i) => console.log(`  [${i + 1}] ${w.address}`));
+  wallets.forEach((w, i) => console.log(`  [${i + 1}] ${w.address} → @${usernames[i]}`));
 
   const iface = rl();
 
@@ -351,18 +368,20 @@ async function main() {
     process.exit(1);
   }
 
-  const twitterUsername = await ask(iface, '\nMasukkan username X (tanpa @): ');
-
   console.log(`\n🚀 Memproses ${selectedWallets.length} wallet...\n`);
 
   for (let i = 0; i < selectedWallets.length; i++) {
     const wallet = selectedWallets[i];
+    // Cari index asli wallet di array wallets untuk ambil username yang sesuai
+    const originalIndex = wallets.indexOf(wallet);
+    const twitterUsername = usernames[originalIndex];
+
     console.log(`\n${'─'.repeat(50)}`);
-    console.log(`Wallet ${i + 1}/${selectedWallets.length}: ${wallet.address}`);
+    console.log(`Wallet ${i + 1}/${selectedWallets.length}: ${wallet.address} → @${twitterUsername}`);
     console.log('─'.repeat(50));
 
     try {
-      await processWallet(wallet, twitterUsername.trim(), iface);
+      await processWallet(wallet, twitterUsername, iface);
     } catch (err) {
       log(wallet, `❌ Error: ${err.message}`);
     }
