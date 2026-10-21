@@ -64,12 +64,14 @@ function encodeVarint(value) {
 }
 
 // ─── PROTO ENCODE ─────────────────────────────────────────────────────────────
-// CreateWalletChallenge payload: proto field1=walletAddr, field2=walletAddr, field3=origin
+// CreateWalletChallenge payload: field1=walletAddr, field2=walletAddr, field3=origin, field4=purpose(enum=1)
 function encodeCreateChallenge(walletAddress, origin) {
   const f1 = encodeProtoString(1, walletAddress);
   const f2 = encodeProtoString(2, walletAddress);
   const f3 = encodeProtoString(3, origin);
-  return Buffer.concat([f1, f2, f3]);
+  // field4 = varint, tag = (4 << 3) | 0 = 0x20, value = 1
+  const f4 = Buffer.from([0x20, 0x01]);
+  return Buffer.concat([f1, f2, f3, f4]);
 }
 
 // LoginWithWallet payload: field1=walletAddress, field2=signature, field3=siweMessage
