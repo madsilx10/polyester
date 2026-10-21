@@ -269,7 +269,7 @@ async function processWallet(wallet, twitterUsername, iface) {
   // Step 6: UpdateProfile dengan username X
   log(wallet, 'Step 6: UpdateProfile...');
   await updateProfile(token, twitterUsername);
-  log(wallet, `Profile diupdate dengan @${twitterUsername}`);
+  log(wallet, `Profile diupdate dengan ${twitterUsername}`);
 
   // Step 7: Poll GetSocialVerification
   log(wallet, 'Step 7: Polling verifikasi X...');
@@ -329,7 +329,6 @@ async function main() {
   }
 
   console.log(`\n📂 ${wallets.length} wallet ditemukan`);
-  wallets.forEach((w, i) => console.log(`  [${i + 1}] ${w.address} → @${usernames[i]}`));
 
   const iface = rl();
 
@@ -377,7 +376,7 @@ async function main() {
     const twitterUsername = usernames[originalIndex];
 
     console.log(`\n${'─'.repeat(50)}`);
-    console.log(`Wallet ${i + 1}/${selectedWallets.length}: ${wallet.address} → @${twitterUsername}`);
+    console.log(`Akun ${i + 1}/${selectedWallets.length}: ${twitterUsername}`);
     console.log('─'.repeat(50));
 
     try {
