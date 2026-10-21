@@ -74,12 +74,12 @@ function encodeCreateChallenge(walletAddress, origin) {
   return Buffer.concat([f1, f2, f3, f4]);
 }
 
-// LoginWithWallet payload: field1=walletAddress, field2=signature, field3=siweMessage
+// LoginWithWallet payload: field1=walletAddress, field2=signature, field8=siweMessage
 function encodeLoginWithWallet(walletAddress, signature, siweMessage) {
   const f1 = encodeProtoString(1, walletAddress);
   const f2 = encodeProtoString(2, signature);
-  const f3 = encodeProtoString(3, siweMessage);
-  return Buffer.concat([f1, f2, f3]);
+  const f8 = encodeProtoString(8, siweMessage);
+  return Buffer.concat([f1, f2, f8]);
 }
 
 // UpdateProfile payload: field1=twitterUsername
