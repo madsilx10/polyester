@@ -64,9 +64,12 @@ function encodeVarint(value) {
 }
 
 // ─── PROTO ENCODE ─────────────────────────────────────────────────────────────
-// CreateWalletChallenge payload: *{walletAddr}*{walletAddr}*{origin}
+// CreateWalletChallenge payload: proto field1=walletAddr, field2=walletAddr, field3=origin
 function encodeCreateChallenge(walletAddress, origin) {
-  return Buffer.from(`*${walletAddress}*${walletAddress}*${origin}`, 'utf8');
+  const f1 = encodeProtoString(1, walletAddress);
+  const f2 = encodeProtoString(2, walletAddress);
+  const f3 = encodeProtoString(3, origin);
+  return Buffer.concat([f1, f2, f3]);
 }
 
 // LoginWithWallet payload: field1=walletAddress, field2=signature, field3=siweMessage
@@ -88,6 +91,7 @@ async function createWalletChallenge(wallet) {
   // addr2 = secondary address (from screenshot looks like another addr or nonce addr)
   // We use wallet address for both
   const payload = encodeCreateChallenge(wallet.address, ORIGIN);
+  log(wallet, `Payload hex: ${payload.toString('hex')}`);
 
   const res = await fetch(`${BASE_URL}/auth.v1.AuthService/CreateWalletChallenge`, {
     method: 'POST',
