@@ -149,6 +149,17 @@ async function generateUsername(token) {
     '/auth.v1.ProfileService/ListGeneratedUsernames',
     '/auth.v1.ProfileService/GetGeneratedUsername',
     '/auth.v1.ProfileService/GenerateUsernames',
+    '/auth.v1.ProfileService/OfferUsername',
+    '/auth.v1.ProfileService/ListUsernameOffers',
+    '/auth.v1.ProfileService/GetUsernameOffer',
+    '/auth.v1.ProfileService/GetUsernameOffers',
+    '/auth.v1.ProfileService/ListUsernames',
+    '/auth.v1.UsernameService/GenerateUsername',
+    '/auth.v1.UsernameService/ListUsernames',
+    '/auth.v1.UsernameService/GetUsernameOffer',
+    '/auth.v1.UsernameService/OfferUsername',
+    '/profile.v1.ProfileService/GenerateUsername',
+    '/profile.v1.ProfileService/GetUsernameOffer',
   ];
 
   for (const ep of endpoints) {
