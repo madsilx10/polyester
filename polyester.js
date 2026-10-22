@@ -148,7 +148,10 @@ async function claimGeneratedUsername(token) {
     headers: { ...HEADERS_BASE, 'authorization': `Bearer ${token}`, 'content-length': '0' },
     body: Buffer.alloc(0),
   });
-  if (!res.ok) throw new Error(`ClaimGeneratedUsername failed: ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`ClaimGeneratedUsername failed: ${res.status} | ${body}`);
+  }
 }
 
 async function startSocialVerification(token) {
