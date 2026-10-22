@@ -142,11 +142,43 @@ async function acceptTerms(token) {
   if (!res.ok) throw new Error(`AcceptTerms failed: ${res.status}`);
 }
 
+async function generateUsername(token) {
+  const endpoints = [
+    '/auth.v1.ProfileService/GenerateUsername',
+    '/auth.v1.ProfileService/SuggestUsername',
+    '/auth.v1.ProfileService/ListGeneratedUsernames',
+    '/auth.v1.ProfileService/GetGeneratedUsername',
+    '/auth.v1.ProfileService/GenerateUsernames',
+  ];
+
+  for (const ep of endpoints) {
+    const res = await fetch(`${BASE_URL}${ep}`, {
+      method: 'POST',
+      headers: { ...HEADERS_BASE, 'authorization': `Bearer ${token}`, 'content-length': '0' },
+      body: Buffer.alloc(0),
+    });
+    console.log(`  [try] ${ep} → ${res.status}`);
+    if (res.ok) {
+      const buf = Buffer.from(await res.arrayBuffer());
+      console.log(`  [hex] ${buf.toString('hex')}`);
+      const str = extractProtoStrings(buf);
+      console.log(`  [str] ${str.slice(0, 100)}`);
+      return str;
+    }
+  }
+  throw new Error('Semua endpoint GenerateUsername gagal');
+}
+
 async function claimGeneratedUsername(token) {
+  // Step 4a: Generate username dulu buat dapet offer_token
+  const offerToken = await generateUsername(token);
+  console.log(`[ClaimGeneratedUsername] offer_token: ${offerToken.slice(0, 50)}...`);
+
+  const payload = encodeProtoString(1, offerToken);
   const res = await fetch(`${BASE_URL}/auth.v1.ProfileService/ClaimGeneratedUsername`, {
     method: 'POST',
-    headers: { ...HEADERS_BASE, 'authorization': `Bearer ${token}`, 'content-length': '0' },
-    body: Buffer.alloc(0),
+    headers: { ...HEADERS_BASE, 'authorization': `Bearer ${token}` },
+    body: payload,
   });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
